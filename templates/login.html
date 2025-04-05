@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&display=swap');
+
+        body {
+            font-family: 'Playfair Display', serif;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 0;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-image: url('{{ url_for('static', filename='images/porsche.jpg') }}');
+            background-size: cover;
+        }
+
+        .login-box {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-width: 350px;
+            background-color: rgba(255, 255, 255, 0.75); /* Adjusted for transparency */
+            padding: 20px;
+            border-radius: 20px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .title {
+            font-size: 28px;
+            color: royalblue;
+            font-weight: 600;
+            letter-spacing: -1px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            padding-left: 30px;
+        }
+
+        .title::before, .title::after {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            border-radius: 50%;
+            left: 0px;
+            background-color: royalblue;
+        }
+
+        .title::before {
+            width: 18px;
+            height: 18px;
+            background-color: royalblue;
+        }
+
+        .title::after {
+            width: 18px;
+            height: 18px;
+            animation: pulse 1s linear infinite;
+        }
+
+        .message {
+            color: rgba(88, 87, 87, 0.822);
+            font-size: 14px;
+        }
+
+        .nav-icons {
+            margin-bottom: 30px;
+        }
+
+        .nav-icon {
+            color: royalblue;
+            text-decoration: none;
+            font-size: 22px;
+            margin: 0 20px;
+            transition: color 0.3s;
+        }
+
+        .nav-icon:hover {
+            color: rgb(56, 90, 194);
+        }
+
+        .nav-icon i {
+            margin-right: 10px;
+        }
+
+        .input-group {
+            display: flex;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .input-group label {
+            flex: 1;
+            color: #333;
+            font-weight: bold;
+            font-size: 18px;
+            margin-right: 10px;
+        }
+
+        .input-group input {
+            flex: 2;
+            padding: 10px;
+            outline: 0;
+            border: 1px solid rgba(105, 105, 105, 0.397);
+            border-radius: 10px;
+            box-sizing: border-box;
+            transition: border-color 0.3s;
+            font-size: 16px;
+            background-color: #f9f9f9;
+        }
+
+        .input-group input:focus {
+            border-color: royalblue;
+            outline: none;
+        }
+
+        button {
+            border: none;
+            outline: none;
+            background-color: royalblue;
+            padding: 10px;
+            border-radius: 10px;
+            color: #fff;
+            font-size: 16px;
+            transform: .3s ease;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background-color: rgb(56, 90, 194);
+        }
+
+        @keyframes pulse {
+            from {
+                transform: scale(0.9);
+                opacity: 1;
+            }
+
+            to {
+                transform: scale(1.8);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-box">
+        <div class="nav-icons">
+            <a href="{{ url_for('index') }}" class="nav-icon"><i class="fas fa-home"></i> Home</a>
+            <a href="{{ url_for('signup') }}" class="nav-icon"><i class="fas fa-user-plus"></i> Sign Up</a>
+        </div>
+        <h2 class="title">Login</h2>
+        <form action="{{ url_for('login') }}" method="post" onsubmit="return validateLogin()">
+            <div class="input-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" placeholder="Username" required>
+            </div>
+            <div class="input-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" placeholder="Password" required>
+            </div>
+            <button type="submit">Login</button>
+        </form>
+    </div>
+
+    <script>
+        window.onload = function() {
+            var username = localStorage.getItem("username");
+            var password = localStorage.getItem("password");
+            if (username && password) {
+                document.getElementById("username").value = username;
+                document.getElementById("password").value = password;
+            }
+        };
+
+        function validateLogin() {
+            var username = document.getElementById("username").value;
+            var password = document.getElementById("password").value;
+
+            if (username.length < 5 || username.length > 20) {
+                alert("Username must be between 5 and 20 characters.");
+                return false;
+            }
+
+            if (password.length < 8 || password.length > 50) {
+                alert("Password must be between 8 and 50 characters.");
+                return false;
+            }
+
+            return true;
+        }
+    </script>
+</body>
+</html>

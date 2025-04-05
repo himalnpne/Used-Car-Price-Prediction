@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Prediction History</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-image: url('../static/images/Background.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            width: 80%;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+
+        h2 {
+            text-align: center;
+            color: #333;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        .btn-back {
+            display: inline-block;
+            padding: 10px 20px;
+            color: #fff;
+            background-color: #007bff;
+            border-radius: 4px;
+            font-weight: bold;
+            text-align: center;
+            margin: 5px;
+            text-decoration: none;
+        }
+
+        .btn-back:hover {
+            background-color: #0056b3;
+        }
+
+        .btn-export {
+            background-color: #28a745;
+            padding: 10px 20px;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn-export:hover {
+            background-color: #218838;
+        }
+
+        .export-container {
+            text-align: right;
+            margin-bottom: 20px;
+        }
+
+        .export-container select {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-right: 10px;
+            font-size: 14px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgb(0,0,0);
+            background-color: rgba(0,0,0,0.4);
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 30%;
+            border-radius: 8px;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .modal-content select {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .modal-content button {
+            width: 100%;
+            padding: 10px;
+            background-color: #28a745;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .modal-content button:hover {
+            background-color: #218838;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Prediction History</h2>
+        <a href="{{ url_for('admin_dashboard') }}" class="btn-back">Dashboard</a>
+
+        <div class="export-container">
+            <select id="filter-option">
+                <option value="all" {% if filter_option == 'all' %}selected{% endif %}>View All</option>
+                <option value="logged_in" {% if filter_option == 'logged_in' %}selected{% endif %}>View Logged In</option>
+                <option value="not_logged_in" {% if filter_option == 'not_logged_in' %}selected{% endif %}>View Not Logged In</option>
+            </select>
+            <button id="export-btn" class="btn btn-export">Export</button>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>User ID</th>
+                    <th>Brand</th>
+                    <th>Model</th>
+                    <th>Transmission Type</th>
+                    <th>Fuel Type</th>
+                    <th>Seller Type</th>
+                    <th>KM Driven</th>
+                    <th>Mileage</th>
+                    <th>Engine</th>
+                    <th>Max Power</th>
+                    <th>Seats</th>
+                    <th>Vehicle Age</th>
+                    <th>Predicted Price</th>
+                    <th>Timestamp</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for prediction in prediction_history %}
+                <tr>
+                    <td>{{ prediction['user_id'] }}</td>
+                    <td>{{ prediction['brand'] }}</td>
+                    <td>{{ prediction['model'] }}</td>
+                    <td>{{ prediction['transmission_type'] }}</td>
+                    <td>{{ prediction['fuel_type'] }}</td>
+                    <td>{{ prediction['seller_type'] }}</td>
+                    <td>{{ prediction['km_driven'] }}</td>
+                    <td>{{ prediction['mileage'] }}</td>
+                    <td>{{ prediction['engine'] }}</td>
+                    <td>{{ prediction['max_power'] }}</td>
+                    <td>{{ prediction['seats'] }}</td>
+                    <td>{{ prediction['vehicle_age'] }}</td>
+                    <td>{{ prediction['predicted_price'] }}</td>
+                    <td>{{ prediction['timestamp'] }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <a href="{{ url_for('admin_dashboard') }}" class="btn-back">Back to Dashboard</a>
+    </div>
+
+    <!-- Modal -->
+    <div id="exportModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h3>Select Export Format</h3>
+            <select id="export-format">
+                <option value="csv">CSV</option>
+                <option value="pdf">PDF</option>
+            </select>
+            <button id="confirm-export-btn" class="btn btn-export">Export</button>
+        </div>
+    </div>
+
+    <script>
+        var modal = document.getElementById('exportModal');
+        var exportBtn = document.getElementById('export-btn');
+        var span = document.getElementsByClassName('close')[0];
+        var confirmExportBtn = document.getElementById('confirm-export-btn');
+        var filterOption = document.getElementById('filter-option');
+
+        filterOption.onchange = function() {
+            window.location.href = "{{ url_for('admin_prediction_history') }}?filter=" + filterOption.value;
+        }
+
+        exportBtn.onclick = function() {
+            modal.style.display = "block";
+        }
+
+        span.onclick = function() {
+            modal.style.display = "none";
+        }
+
+        confirmExportBtn.onclick = function() {
+            var format = document.getElementById('export-format').value;
+            var filter = filterOption.value;
+            window.location.href = "{{ url_for('export_prediction_history') }}?format=" + format + "&filter=" + filter;
+            modal.style.display = "none";
+        }
+
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
+    </script>
+</body>
+</html>

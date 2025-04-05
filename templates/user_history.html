@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>History</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Your Prediction History</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>Brand</th>
+                    <th>Model</th>
+                    <th>Vehicle Age</th>
+                    <th>KM Driven</th>
+                    <th>Seller Type</th>
+                    <th>Fuel Type</th>
+                    <th>Transmission Type</th>
+                    <th>Mileage</th>
+                    <th>Engine</th>
+                    <th>Max Power</th>
+                    <th>Seats</th>
+                    <th>Predicted Price</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for record in history %}
+                <tr>
+                    <td>{{ record['brand'] }}</td>
+                    <td>{{ record['model'] }}</td>
+                    <td>{{ record['vehicle_age'] }}</td>
+                    <td>{{ record['km_driven'] }}</td>
+                    <td>{{ record['seller_type'] }}</td>
+                    <td>{{ record['fuel_type'] }}</td>
+                    <td>{{ record['transmission_type'] }}</td>
+                    <td>{{ record['mileage'] }}</td>
+                    <td>{{ record['engine'] }}</td>
+                    <td>{{ record['max_power'] }}</td>
+                    <td>{{ record['seats'] }}</td>
+                    <td>{{ record['prediction'] }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <a href="/">Back to Dashboard</a>
+    </div>
+</body>
+</html>

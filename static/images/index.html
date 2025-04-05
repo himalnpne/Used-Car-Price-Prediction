@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HIMALNPNE - Car Price Prediction</title>
+    <style>
+        body, html {
+            height: 100%;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            color: white;
+            overflow-x: hidden;
+        }
+        .bg {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            text-align: center;
+            padding-bottom: 20px;
+        }
+        .section {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px 0;
+        }
+        .top-section {
+            background-image: url('background.png');
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+            height: 100vh;
+        }
+        .bottom-section {
+            background-image: url('porsche.jpg');
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+            height: 100vh;
+            color: black;
+            display: flex;
+            flex-direction: row;
+            justify-content: space-around;
+            align-items: flex-start;
+            padding-top: 40px;
+        }
+        .header {
+            width: 100%;
+            padding: 10px 0; /* Adjusted padding to move the header up */
+            font-size: 2em;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .content {
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            margin: 20px;
+            width: 80%;
+            max-width: 600px;
+        }
+        .button {
+            background-color: #4CAF50;
+            border: none;
+            color: white;
+            padding: 15px 32px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+            border-radius: 10px;
+            transition: background-color 0.3s ease;
+        }
+        .button:hover {
+            background-color: #45a049;
+        }
+        .login-signup {
+            margin-top: 20px;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+        }
+        .login-signup a {
+            color: white;
+            text-decoration: none;
+            margin: 0 10px;
+            padding: 10px 20px;
+            border: 1px solid white;
+            border-radius: 5px;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        .login-signup a:hover {
+            background-color: white;
+            color: black;
+        }
+        .about-us, .porsche-content {
+            background: rgba(255, 255, 255, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px;
+            text-align: center;
+            width: 45%;
+            max-width: 600px;
+            color: black;
+        }
+        .footer {
+            padding: 10px;
+            width: 100%;
+            text-align: center;
+            background: rgba(0, 0, 0, 0.5);
+            position: absolute;
+            bottom: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="bg">
+        <div class="section top-section">
+            <div class="header">
+                <h1>HIMALNPNE</h1>
+            </div>
+            <div class="content">
+                <a href="prediction.html" class="button">Predict My Car Price</a>
+            </div>
+            <div class="login-signup">
+                <a href="login.html">Login</a>
+                <a href="signup.html">Signup</a>
+            </div>
+        </div>
+        <div class="section bottom-section">
+            <div class="about-us">
+                <h2>About Us</h2>
+                <p>We are dedicated to providing accurate car price predictions using advanced algorithms and extensive data analysis.</p>
+            </div>
+            <div class="porsche-content">
+                <h2>Explore Our Services</h2>
+                <p>Learn more about our car price prediction services and how we can assist you in making informed decisions.</p>
+            </div>
+        </div>
+        <div class="footer">
+            <p>&copy; 2023 HIMALNPNE. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html>

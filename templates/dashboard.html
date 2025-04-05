@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600&family=Playfair+Display:wght@600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Montserrat', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
+            background: url('{{ url_for('static', filename='images/predict.png') }}') no-repeat center center fixed;
+            background-size: cover;
+        }
+        .container {
+            width: 80%;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.9); /* Adjusted for transparency */
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            font-family: 'Playfair Display', serif;
+        }
+        h2 {
+            color: #555;
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background-color: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 15px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        a {
+            display: inline-block;
+            margin: 10px;
+            padding: 10px 20px;
+            text-decoration: none;
+            color: #fff;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+        .logout-btn {
+            background-color: #e74c3c;
+        }
+        .home-btn {
+            background-color: #3498db;
+        }
+        .edit-btn {
+            background-color: #f39c12;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px;
+            transition: background-color 0.3s ease;
+        }
+        .delete-btn {
+            background-color: #e74c3c;
+            color: #fff;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .export-container {
+            text-align: right;
+            margin-bottom: 20px;
+        }
+        .btn-export {
+            background-color: #28a745;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .btn-export:hover {
+            background-color: #218838;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 30%;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+        }
+
+        .edit-form input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .edit-form button {
+            background-color: #28a745;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .edit-form button:hover {
+            background-color: #218838;
+        }
+
+        .saved-cars {
+            margin-top: 40px;
+        }
+
+        .saved-cars h2 {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .saved-cars ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .saved-cars li {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-icon {
+            margin-right: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Dashboard</h1>
+        <a href="{{ url_for('logout') }}" class="logout-btn"><i class="fas fa-sign-out-alt btn-icon"></i> Logout</a>
+        <a href="{{ url_for('index') }}" class="home-btn"><i class="fas fa-home btn-icon"></i> Home</a>
+       
+        <a href="{{ url_for('predict_page') }}" class="home-btn"><i class="fas fa-chart-line btn-icon"></i> Predict</a>
+        <h2>Welcome, {{ user.username }}</h2>
+        <p>Email: {{ user.email }}</p>
+        <p>Phone Number: {{ user.phone_number }}</p>
+
+        <button id="edit-details-btn" class="edit-btn"><i class="fas fa-edit btn-icon"></i> Edit Details</button>
+
+        <div class="export-container">
+            <button id="export-btn" class="btn btn-export"><i class="fas fa-file-export btn-icon"></i> Export</button>
+        </div>
+
+        <h3>Prediction History</h3>
+        <table>
+            <tr>
+                <th>Brand</th>
+                <th>Model</th>
+                <th>Vehicle Age</th>
+                <th>KM Driven</th>
+                <th>Seller Type</th>
+                <th>Fuel Type</th>
+                <th>Transmission Type</th>
+                <th>Mileage</th>
+                <th>Engine</th>
+                <th>Max Power</th>
+                <th>Seats</th>
+                <th>Prediction</th>
+                <th>Action</th>
+            </tr>
+            {% for record in history %}
+            <tr>
+                <td>{{ record['brand'] }}</td>
+                <td>{{ record['model'] }}</td>
+                <td>{{ record['vehicle_age'] }}</td>
+                <td>{{ record['km_driven'] }}</td>
+                <td>{{ record['seller_type'] }}</td>
+                <td>{{ record['fuel_type'] }}</td>
+                <td>{{ record['transmission_type'] }}</td>
+                <td>{{ record['mileage'] }}</td>
+                <td>{{ record['engine'] }}</td>
+                <td>{{ record['max_power'] }}</td>
+                <td>{{ record['seats'] }}</td>
+                <td>{{ record['prediction'] }}</td>
+                <td>
+                    <form action="{{ url_for('delete_history', history_id=record['id']) }}" method="post">
+                        <button type="submit" class="delete-btn"><i class="fas fa-trash-alt btn-icon"></i> Delete</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+
+        <div class="saved-cars">
+            <h2>Saved Cars</h2>
+            <table>
+                <tr>
+                    <th>Brand</th>
+                    <th>Model</th>
+                    <th>Vehicle Age</th>
+                    <th>KM Driven</th>
+                    <th>Seller Type</th>
+                    <th>Fuel Type</th>
+                    <th>Transmission Type</th>
+                    <th>Mileage</th>
+                    <th>Engine</th>
+                    <th>Max Power</th>
+                    <th>Seats</th>
+                    <th>Actual Price</th>
+                    <th>Action</th>
+                </tr>
+                {% for car in saved_cars %}
+                <tr>
+                    <td>{{ car.brand }}</td>
+                    <td>{{ car.model }}</td>
+                    <td>{{ car.vehicle_age }}</td>
+                    <td>{{ car.km_driven }}</td>
+                    <td>{{ car.seller_type }}</td>
+                    <td>{{ car.fuel_type }}</td>
+                    <td>{{ car.transmission_type }}</td>
+                    <td>{{ car.mileage }}</td>
+                    <td>{{ car.engine }}</td>
+                    <td>{{ car.max_power }}</td>
+                    <td>{{ car.seats }}</td>
+                    <td>{{ car.actual_price }}</td>
+                    <td>
+                        <form action="{{ url_for('delete_saved_car', car_id=car.id) }}" method="post">
+                            <button type="submit" class="delete-btn"><i class="fas fa-trash-alt btn-icon"></i> Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+
+    <!-- Edit Details Modal -->
+    <div id="editDetailsModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h3>Edit Details</h3>
+            <form class="edit-form" action="{{ url_for('update_user_details') }}" method="post">
+                <input type="text" name="username" value="{{ user.username }}" placeholder="Username">
+                <input type="email" name="email" value="{{ user.email }}" placeholder="Email">
+                <input type="text" name="phone_number" value="{{ user.phone_number }}" placeholder="Phone Number">
+                <input type="password" name="password" placeholder="New Password">
+                <input type="password" name="confirm_password" placeholder="Confirm New Password">
+                <button type="submit"><i class="fas fa-save btn-icon"></i> Save Changes</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Export Modal -->
+    <div id="exportModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h3>Select Export Format</h3>
+            <select id="export-format">
+                <option value="csv">CSV</option>
+                <option value="pdf">PDF</option>
+            </select>
+            <button id="confirm-export-btn" class="btn btn-export"><i class="fas fa-file-export btn-icon"></i> Export</button>
+        </div>
+    </div>
+
+    <script>
+        var editModal = document.getElementById('editDetailsModal');
+        var exportModal = document.getElementById('exportModal');
+        var editBtn = document.getElementById('edit-details-btn');
+        var exportBtn = document.getElementById('export-btn');
+        var closeBtns = document.getElementsByClassName('close');
+        var confirmExportBtn = document.getElementById('confirm-export-btn');
+
+        editBtn.onclick = function() {
+            editModal.style.display = "block";
+        }
+
+        exportBtn.onclick = function() {
+            exportModal.style.display = "block";
+        }
+
+        for (var i = 0; i < closeBtns.length; i++) {
+            closeBtns[i].onclick = function() {
+                editModal.style.display = "none";
+                exportModal.style.display = "none";
+            }
+        }
+
+        confirmExportBtn.onclick = function() {
+            var format = document.getElementById('export-format').value;
+            window.location.href = "{{ url_for('user_export_prediction_history') }}?format=" + format;
+            exportModal.style.display = "none";
+        }
+
+        window.onclick = function(event) {
+            if (event.target == editModal) {
+                editModal.style.display = "none";
+            }
+            if (event.target == exportModal) {
+                exportModal.style.display = "none";
+            }
+        }
+    </script>
+</body>
+</html>

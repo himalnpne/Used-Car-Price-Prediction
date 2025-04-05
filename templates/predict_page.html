@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Car Price Prediction</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background: url('{{ url_for('static', filename='images/predict.png') }}') no-repeat center center fixed;
+            background-size: cover;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: auto;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 10px;
+            position: relative;
+        }
+
+        h1 {
+            font-size: 28px;
+            text-align: center;
+        }
+
+        .loader {
+            display: none;
+            position: fixed; /* Fixed positioning */
+            left: 50%; /* Center horizontally */
+            top: 50%; /* Center vertically */
+            transform: translate(-50%, -50%); /* Offset by half of its size */
+            overflow: hidden;
+            z-index: 1000; /* Ensure it's on top of other elements */
+        }
+
+        .wheel {
+            fill: rgb(128, 128, 128);
+            font-size: 100px;
+            width: 100px;
+            height: 100px;
+            border-radius: 6em;
+            text-align: center;
+            animation: rolling 1s linear infinite;
+        }
+
+        #rim {
+            fill: rgb(126, 126, 126);
+        }
+
+        #tire {
+            fill: rgb(55, 55, 55);
+        }
+
+        .road {
+            position: absolute;
+            margin-top: -4px;
+            width: 100%;
+            height: 10px;
+            border-radius: 5em;
+            background-color: rgb(55, 55, 55);
+            animation: road-move 2s linear infinite;
+        }
+
+        @keyframes rolling {
+            to {
+                transform: rotate(-360deg);
+            }
+        }
+
+        @keyframes road-move {
+            from {
+                transform: translateX(-140%);
+            }
+            to {
+                transform: translateX(100%);
+            }
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .button {
+            padding: 10px 20px;
+            font-size: 18px;
+            border-radius: 5px;
+            border: none;
+            color: white;
+            text-decoration: none;
+            display: inline-block;
+            cursor: pointer;
+            transition: all 450ms ease-in-out;
+        }
+
+        .button:hover {
+            box-shadow: inset 0px 1px 0px 0px rgba(255, 255, 255, 0.4),
+            inset 0px -4px 0px 0px rgba(0, 0, 0, 0.2),
+            0px 0px 0px 4px rgba(255, 255, 255, 0.2),
+            0px 0px 180px 0px;
+            transform: translateY(-2px);
+        }
+
+        .button:hover .text {
+            color: white;
+        }
+
+        .button:hover .sparkle {
+            fill: white;
+            transform: scale(1.2);
+        }
+
+        #login-btn {
+            background: #1C1A1C;
+        }
+
+        #login-btn:hover {
+            background: linear-gradient(0deg, #A47CF3, #683FEA);
+            box-shadow: 0px 0px 180px 0px #9917FF;
+        }
+
+        #signup-btn {
+            background: #3C3A3C;
+        }
+
+        #signup-btn:hover {
+            background: linear-gradient(0deg, #F37C7C, #EA3F3F);
+            box-shadow: 0px 0px 180px 0px #FF1717;
+        }
+
+        #logout-btn {
+            background: #5C5A5C;
+        }
+
+        #logout-btn:hover {
+            background: linear-gradient(0deg, #7CF3A4, #3FEA68);
+            box-shadow: 0px 0px 180px 0px #17FF99;
+        }
+
+        #dashboard-btn {
+            background: #1C1A1C;
+        }
+
+        #dashboard-btn:hover {
+            background: linear-gradient(0deg, #A47CF3, #683FEA);
+            box-shadow: 0px 0px 180px 0px #9917FF;
+        }
+
+        #predict {
+            background: #3C3A3C;
+        }
+
+        #predict:hover {
+            background: linear-gradient(0deg, #F37C7C, #EA3F3F);
+            box-shadow: 0px 0px 180px 0px #FF1717;
+        }
+
+        #clear-form {
+            background: #5C5A5C;
+        }
+
+        #clear-form:hover {
+            background: linear-gradient(0deg, #7CF3A4, #3FEA68);
+            box-shadow: 0px 0px 180px 0px #17FF99;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 10px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 20px;
+            font-weight: bold; /* Make labels bold */
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 10px;
+            font-size: 20px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            transition: border-color 0.3s, box-shadow 0.3s; /* Add transition for focus effect */
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            border-color: #66afe9;
+            outline: none;
+            box-shadow: 0 0 8px rgba(102, 175, 233, 0.6); /* Add focus effect */
+        }
+
+        .fuel-seller-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .prediction {
+            font-size: 24px;
+            font-weight: bold;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .predict-clear-row {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .car-details {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 20px;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+        }
+
+        .home-btn {
+            background: #1C1A1C;
+            color: white;
+            padding: 10px 20px;
+            font-size: 18px;
+            border-radius: 5px;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+        }
+
+        .home-btn:hover {
+            background: linear-gradient(0deg, #A47CF3, #683FEA);
+            box-shadow: 0px 0px 180px 0px #9917FF;
+        }
+
+        /* Increased gap between specific form groups */
+        .form-row .form-group:nth-child(1),
+        .form-row .form-group:nth-child(2),
+        .form-row .form-group:nth-child(3),
+        .form-row .form-group:nth-child(4),
+        .form-row .form-group:nth-child(5),
+        .form-row .form-group:nth-child(6) {
+            margin-right: 20px; /* Adjust this value as needed */
+        }
+
+        .similar-cars {
+            margin-top: 40px;
+        }
+
+        .similar-cars h2 {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .similar-cars ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .similar-cars li {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .save-car-btn {
+            background: #3C3A3C;
+            color: white;
+            padding: 10px 20px;
+            font-size: 18px;
+            border-radius: 5px;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+            cursor: pointer;
+            border: none;
+        }
+
+        .save-car-btn:hover {
+            background: linear-gradient(0deg, #F37C7C, #EA3F3F);
+            box-shadow: 0px 0px 180px 0px #FF1717;
+        }
+
+        .login-prompt {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .login-prompt a {
+            color: #007BFF;
+            text-decoration: none;
+        }
+
+        .login-prompt a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Car Price Prediction</h1>
+        <div class="loader" id="spinner">
+            <svg
+                xml:space="preserve"
+                viewBox="0 0 254.532 254.532"
+                xmlns:xlink="http://www.w3.org/1999/xlink"
+                xmlns="http://www.w3.org/2000/svg"
+                id="Capa_1"
+                version="1.1"
+                class="wheel"
+            >
+                <g>
+                    <path
+                        d="M127.267,0C57.092,0,0,57.091,0,127.266s57.092,127.266,127.267,127.266c70.174,0,127.266-57.091,127.266-127.266
+                            S197.44,0,127.267,0z M127.267,217.656c-49.922,0-90.391-40.468-90.391-90.39s40.469-90.39,90.391-90.39
+                            c49.92,0,90.39,40.468,90.39,90.39S177.186,217.656,127.267,217.656z"
+                        id="tire"
+                    ></path>
+                    <path
+                        d="M127.267,48.578c-43.39,0-78.689,35.299-78.689,78.688c0,43.389,35.3,78.688,78.689,78.688
+                            c43.389,0,78.688-35.299,78.688-78.688C205.955,83.877,170.655,48.578,127.267,48.578z M195.878,122.249h-38.18
+                            c-0.78-4.825-2.686-9.275-5.435-13.079l26.954-26.954C188.679,93.112,194.771,106.996,195.878,122.249z M132.204,58.648
+                            c15.244,1.087,29.123,7.156,40.025,16.591l-26.948,26.949c-3.804-2.748-8.253-4.653-13.077-5.433V58.648z M122.329,58.648v38.106
+                            c-4.824,0.78-9.274,2.685-13.078,5.434L82.302,75.24C93.204,65.805,107.085,59.735,122.329,58.648z M75.313,82.217l26.955,26.954
+                            c-2.749,3.803-4.654,8.253-5.434,13.077h-38.18C59.761,106.996,65.853,93.113,75.313,82.217z M58.643,132.123h38.192
+                            c0.779,4.824,2.685,9.274,5.434,13.078l-27.029,27.029C65.788,161.308,59.714,147.398,58.643,132.123z M122.329,195.884
+                            c-15.285-1.09-29.197-7.188-40.113-16.666l27.035-27.035c3.804,2.749,8.254,4.654,13.078,5.434V195.884z M122.329,147.459v0.072
+                            c-2.131-0.518-4.131-1.36-5.953-2.474l0.047-0.047c-2.85-1.738-5.244-4.132-6.982-6.983l-0.046,0.046
+                            c-1.114-1.822-1.956-3.821-2.474-5.952h0.071c-0.385-1.585-0.611-3.233-0.611-4.937c0-1.704,0.227-3.352,0.611-4.937h-0.071
+                            c0.518-2.13,1.359-4.129,2.474-5.951l0.046,0.046c1.738-2.85,4.133-5.245,6.982-6.982l-0.047-0.047
+                            c1.822-1.114,3.822-1.957,5.953-2.474v0.072c1.586-0.385,3.233-0.612,4.938-0.612s3.352,0.227,4.938,0.612v-0.072
+                            c2.131,0.518,4.13,1.359,5.951,2.473l-0.047,0.047c2.851,1.737,5.245,4.132,6.983,6.982l0.046-0.046
+                            c1.115,1.822,1.957,3.822,2.475,5.953h-0.071c0.385,1.585,0.611,3.233,0.611,4.937c0,1.704-0.227,3.352-0.611,4.937h0.071
+                            c-0.518,2.131-1.359,4.131-2.475,5.953l-0.046-0.046c-1.738,2.85-4.133,5.244-6.983,6.982l0.047,0.046
+                            c-1.821,1.114-3.82,1.956-5.951,2.474v-0.072c-1.586,0.385-3.233,0.612-4.938,0.612S123.915,147.845,122.329,147.459z
+                            M132.204,195.884v-38.267c4.824-0.78,9.273-2.685,13.077-5.433l27.034,27.034C161.4,188.696,147.488,194.794,132.204,195.884z
+                            M179.292,172.23l-27.028-27.028c2.749-3.804,4.654-8.254,5.435-13.079h38.191C194.818,147.398,188.745,161.308,179.292,172.23z"
+                        id="rim"
+                    ></path>
+                </g>
+            </svg>
+            <div class="road"></div>
+        </div>
+        <div class="button-container">
+            <a href="{{ url_for('index') }}" class="home-btn button">Go to Home</a>
+            {% if user %}
+                <a href="{{ url_for('dashboard') }}" id="dashboard-btn" class="button">Go to Dashboard</a>
+                <a href="{{ url_for('logout') }}" id="logout-btn" class="button">Logout</a>
+            {% else %}
+                <a href="{{ url_for('login') }}" id="login-btn" class="button">Login</a>
+                <a href="{{ url_for('signup') }}" id="signup-btn" class="button">Signup</a>
+            {% endif %}
+        </div>
+        
+        <form id="car-form" method="POST" action="/predict" onsubmit="showSpinner()">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="brand">Brand:</label>
+                    <select id="brand" name="brand" required>
+                        <option value="" disabled selected>Choose</option>
+                        {% for brand in brands %}
+                            <option value="{{ brand }}" {% if brand == request.form.get('brand') %}selected{% endif %}>{{ brand }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="model">Model:</label>
+                    <select id="model" name="model" required>
+                        <option value="" disabled selected>Choose</option>
+                        {% if models %}
+                            {% for model in models %}
+                                <option value="{{ model }}" {% if model == request.form.get('model') %}selected{% endif %}>{{ model }}</option>
+                            {% endfor %}
+                        {% endif %}
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="transmission_type">Transmission Type:</label>
+                    <select id="transmission_type" name="transmission_type" required>
+                        <option value="" disabled selected>Choose</option>
+                        <option value="Manual" {% if request.form.get('transmission_type') == 'Manual' %}selected{% endif %}>Manual</option>
+                        <option value="Automatic" {% if request.form.get('transmission_type') == 'Automatic' %}selected{% endif %}>Automatic</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="fuel-seller-group">
+                <div class="form-group">
+                    <label for="fuel_type">Fuel Type:</label>
+                    <select id="fuel_type" name="fuel_type" required>
+                        <option value="" disabled selected>Choose</option>
+                        <option value="Petrol" {% if request.form.get('fuel_type') == 'Petrol' %}selected{% endif %}>Petrol</option>
+                        <option value="Diesel" {% if request.form.get('fuel_type') == 'Diesel' %}selected{% endif %}>Diesel</option>
+                        <option value="CNG" {% if request.form.get('fuel_type') == 'CNG' %}selected{% endif %}>CNG</option>
+                        <option value="LPG" {% if request.form.get('fuel_type') == 'LPG' %}selected{% endif %}>LPG</option>
+                     
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="seller_type">Seller Type:</label>
+                    <select id="seller_type" name="seller_type" required>
+                        <option value="" disabled selected>Choose</option>
+                        <option value="Individual" {% if request.form.get('seller_type') == 'Individual' %}selected{% endif %}>Individual</option>
+                        <option value="Dealer" {% if request.form.get('seller_type') == 'Dealer' %}selected{% endif %}>Dealer</option>
+                        <option value="Trustmark Dealer" {% if request.form.get('seller_type') == 'Trustmark Dealer' %}selected{% endif %}>Trustmark Dealer</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="km_driven">KM Driven:</label>
+                    <input type="number" id="km_driven" name="km_driven" value="{{ request.form.get('km_driven') }}" step="any" min="1" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="mileage">Mileage (kmpl):</label>
+                    <input type="number" step="0.1" id="mileage" name="mileage" value="{{ request.form.get('mileage') }}" min="1" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="engine">Engine (CC):</label>
+                    <input type="number" id="engine" name="engine" value="{{ request.form.get('engine') }}" step="any" min="1" required>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="max_power">Max Power (bhp):</label>
+                    <input type="number" id="max_power" name="max_power" value="{{ request.form.get('max_power') }}" step="any" min="1" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="seats">Seats:</label>
+                    <input type="number" id="seats" name="seats" value="{{ request.form.get('seats') }}" step="any" min="1" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="vehicle_age">Vehicle Age:</label>
+                    <input type="number" id="vehicle_age" name="vehicle_age" value="{{ request.form.get('vehicle_age') }}" step="any" min="1" required>
+                </div>
+            </div>
+
+            <div class="predict-clear-row">
+                <input type="submit" id="predict" value="Predict" class="button">
+                <button type="button" id="clear-form" class="button">Clear All Fields</button>
+            </div>
+        </form>
+        
+        {% if prediction %}
+            <div class="prediction">Predicted Price: RS. {{ prediction }}</div>
+            <div class="similar-cars">
+                <h2>Similar Cars</h2>
+                {% if user %}
+                    <ul id="similar-cars-list">
+                        {% for car in similar_cars %}
+                            <li>
+                                <div>
+                                    Brand: {{ car.brand }}<br>
+                                    Model: {{ car.model }}<br>
+                                    Vehicle Age: {{ car.vehicle_age }} years<br>
+                                    KM Driven: {{ car.km_driven }} km<br>
+                                    Seller Type: {{ car.seller_type }}<br>
+                                    Fuel Type: {{ car.fuel_type }}<br>
+                                    Transmission Type: {{ car.transmission_type }}<br>
+                                    Mileage: {{ car.mileage }} kmpl<br>
+                                    Engine: {{ car.engine }} CC<br>
+                                    Max Power: {{ car.max_power }} bhp<br>
+                                    Seats: {{ car.seats }}<br>
+                                    Selling Price: RS. {{ car.selling_price }}
+                                </div>
+                                <button class="save-car-btn" onclick="saveCarDetails('{{ car.brand }}', '{{ car.model }}', '{{ car.transmission_type }}', '{{ car.fuel_type }}', '{{ car.seller_type }}', {{ car.km_driven }}, {{ car.mileage }}, {{ car.engine }}, {{ car.max_power }}, {{ car.seats }}, {{ car.vehicle_age }}, {{ prediction }})">Save</button>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <div class="login-prompt">
+                        <p>To view similar cars, please <a href="{{ url_for('login') }}">Log in</a> or <a href="{{ url_for('signup') }}">Sign up</a>.</p>
+                    </div>
+                {% endif %}
+            </div>
+        {% elif error %}
+            <div class="error">Error: {{ error }}</div>
+        {% endif %}
+    </div>
+
+    <script>
+        $(document).ready(function(){
+            $('#brand').change(function(){
+                var brand = $(this).val();
+                $.ajax({
+                    url: '/get_models',
+                    method: 'POST',
+                    data: {brand: brand},
+                    success: function(response) {
+                        $('#model').empty().append('<option value="" disabled selected>Choose</option>');
+                        $.each(response.models, function(index, model){
+                            $('#model').append('<option value="'+model+'">'+model+'</option>');
+                        });
+                        // Set the selected model based on the form data
+                        var selectedModel = "{{ request.form.get('model') }}";
+                        if (selectedModel) {
+                            $('#model').val(selectedModel);
+                        }
+                    }
+                });
+            });
+
+            $('#model').change(function(){
+                var brand = $('#brand').val();
+                var model = $(this).val();
+                $.ajax({
+                    url: '/get_additional_data',
+                    method: 'POST',
+                    data: {brand: brand, model: model},
+                    success: function(response) {
+                        if(response.seller_type) {
+                            $('#seller_type').val(response.seller_type);
+                        }
+                        if(response.fuel_type) {
+                            $('#fuel_type').val(response.fuel_type);
+                        }
+                        if(response.transmission_type) {
+                            $('#transmission_type').val(response.transmission_type);
+                        }
+                    }
+                });
+            });
+
+            // Trigger change event to load models and additional data if a brand is already selected
+            if ($('#brand').val()) {
+                $('#brand').trigger('change');
+            }
+
+            if ($('#model').val()) {
+                $('#model').trigger('change');
+            }
+
+            // Clear all form fields and the prediction display
+            $('#clear-form').click(function() {
+                $('#car-form')[0].reset();
+                $('#brand').val('').trigger('change');
+                $('#model').empty().append('<option value="" disabled selected>Choose</option>');
+                $('#transmission_type').val('');
+                $('#fuel_type').val('');
+                $('#seller_type').val('');
+                $('#km_driven').val('');
+                $('#mileage').val('');
+                $('#engine').val('');
+                $('#max_power').val('');
+                $('#seats').val('');
+                $('#vehicle_age').val('');
+                $('.prediction').html(''); // Clear the prediction display
+                $('.similar-cars ul').empty(); // Clear the similar cars list
+            });
+        });
+
+        function showSpinner() {
+            document.getElementById('spinner').style.display = 'block';
+            setTimeout(function() {
+                document.getElementById('spinner').style.display = 'none';
+            }, 2000); // 2 second delay
+        }
+
+        function saveCarDetails(brand, model, transmission_type, fuel_type, seller_type, km_driven, mileage, engine, max_power, seats, vehicle_age, predicted_price) {
+            const carDetails = {
+                brand: brand,
+                model: model,
+                transmission_type: transmission_type,
+                fuel_type: fuel_type,
+                seller_type: seller_type,
+                km_driven: km_driven,
+                mileage: mileage,
+                engine: engine,
+                max_power: max_power,
+                seats: seats,
+                vehicle_age: vehicle_age,
+                predicted_price: predicted_price
+            };
+
+            fetch('/save_car_details', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(carDetails)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    alert('Car details saved successfully!');
+                } else {
+                    alert('Failed to save car details.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Failed to save car details.');
+            });
+        }
+    </script>
+</body>
+</html>
